@@ -119,6 +119,39 @@ commands:
             - bytecode-report-<< parameters.label >>-cli.txt
       - matrix_notify_failure_unless_pr
 
+  install_python3:
+    description: "Install python3 and given packages."
+    parameters:
+      packages:
+        description: "List of optional python packages to be installed (separated by space)."
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: Install python and dependencies
+          command: |
+            sudo apt update
+            if ! python3 --version >/dev/null 2>&1
+            then
+              sudo apt install python3 --assume-yes --no-install-recommends
+            fi
+            sudo apt install python3-pip
+            if [ -n "<< parameters.packages >>" ]
+            then
+              echo "Installing additional packages..."
+              python3 -m pip install --user << parameters.packages >>
+            fi
+
+  install_foundry:
+    description: "Install Foundry."
+    steps:
+      - run:
+          name: Install foundry
+          command: |
+            # Note: Currently Foundry only has nightly builds and there is no release checksum
+            wget https://github.com/foundry-rs/foundry/releases/download/nightly/foundry_nightly_linux_amd64.tar.gz --output-document /tmp/foundry.tar.gz
+            sudo tar --extract --gzip --file /tmp/foundry.tar.gz --directory /usr/local/bin
+
 defaults:
 
   # --------------------------------------------------------------------------
@@ -717,14 +750,8 @@ jobs:
     <<: *base_cimg_small
     steps:
       - checkout
-      - run:
-          name: Install pip
-          command: |
-            sudo apt -q update
-            sudo apt install -y python3-pip
-      - run:
-          name: Install pylint and dependencies of the scripts that will be linted
-          command: python3 -m pip install
+      - install_python3:
+          packages: >
             pylint
             z3-solver
             pygments-lexer-solidity
@@ -772,12 +799,8 @@ jobs:
     <<: *base_cimg_small
     steps:
       - checkout
-      - run:
-          name: Z3 python deps
-          command: |
-            sudo apt-get -qq update
-            sudo apt-get -qy install python3-pip
-            pip3 install --user z3-solver
+      - install_python3:
+          packages: z3-solver
       - run: *run_proofs
       - matrix_notify_failure_unless_pr
 
@@ -1252,6 +1275,9 @@ jobs:
       - checkout
       - attach_workspace:
           at: /tmp/workspace
+      - install_foundry
+      - install_python3:
+          packages: requests
       - run:
           name: Install lsof
           command: |
@@ -1273,17 +1299,17 @@ jobs:
             equal: [<< parameters.binary_type >>, "solcjs"]
           steps:
             - run:
-                name: External <<parameters.project>> tests (solcjs)
+                name: External << parameters.project >> tests (<< parameters.binary_type >>)
                 command: |
-                  test/externalTests/<<parameters.project>>.sh solcjs /tmp/workspace/soljson.js
+                  test/external_tests.py run --solc-binary-type << parameters.binary_type >> --solc-binary-path /tmp/workspace/soljson.js --run << parameters.project >>
       - when:
           condition:
             equal: [<< parameters.binary_type >>, "native"]
           steps:
             - run:
-                name: External <<parameters.project>> tests (native)
+                name: External << parameters.project >> tests (<< parameters.binary_type >>)
                 command: |
-                  test/externalTests/<<parameters.project>>.sh native /tmp/workspace/solc/solc-static-linux
+                  test/external_tests.py run --solc-binary-type << parameters.binary_type >> --solc-binary-path /tmp/workspace/solc/solc-static-linux --run << parameters.project >>
       - store_artifacts:
           path: reports/externalTests/
       # persist_to_workspace fails if the directory does not exist and the test script will create
@@ -1298,6 +1324,8 @@ jobs:
   c_ext_benchmarks:
     <<: *base_node_small
     steps:
+      - install_python3:
+          packages: requests
       - checkout
       - attach_workspace:
           at: .
