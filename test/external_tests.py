@@ -51,7 +51,7 @@ def external_tests_scripts() -> dict:
             # TODO: Remove `file_name == "common"` when we complete the migration
             # of the external tests to python, since there will be no more
             # common.sh script in the externalTests folder.
-            if (extension == "sh" or extension == "py") and not file_name == "common":
+            if extension in ('sh', 'py') and not file_name == "common":
                 test_scripts[file_name] = file_path
     return test_scripts
 
