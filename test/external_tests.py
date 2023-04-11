@@ -20,6 +20,7 @@
 # ------------------------------------------------------------------------------
 
 from argparse import ArgumentParser, Namespace
+import os
 from os import listdir
 from pathlib import Path
 import sys
@@ -58,16 +59,16 @@ def external_tests_scripts() -> dict:
 def display_available_external_tests(_) -> int:
     print("Available external tests:")
     print(*external_tests_scripts().keys())
-    return 0
+    return os.EX_OK
 
 
 def run_test_script(solc_binary_type: str, solc_binary_path: Path, tests: dict) -> int:
     for test_name, test_script_path in tests.items():
         print(f"Running {test_name} external test...")
         ret = run_cmd(f"{test_script_path} {solc_binary_type} {solc_binary_path}")
-        if ret != 0:
+        if ret != os.EX_OK:
             return ret
-    return 0
+    return os.EX_OK
 
 
 def run_external_tests(args: dict) -> int:
@@ -107,7 +108,7 @@ def parse_commandline() -> Namespace:
     list_command.set_defaults(cmd=display_available_external_tests)
 
     run_command = subparser.add_parser(
-        "run",
+        "test",
         help="Run external tests.",
     )
     run_command.set_defaults(cmd=run_external_tests)
@@ -157,10 +158,10 @@ def main():
         args = parse_commandline()
         return args.cmd(vars(args))
     except OptionNotFound:
-        return 1
+        return os.EX_USAGE
     except ExternalTestNotFound as exception:
         print(f"Error: {exception}", file=sys.stderr)
-        return 1
+        return os.EX_NOINPUT
     except RuntimeError as exception:
         print(f"Error: {exception}", file=sys.stderr)
         return 1
