@@ -1366,12 +1366,6 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Install dependencies of helper scripts
-          command: |
-            sudo apt update
-            sudo apt install python3-pip --assume-yes --no-install-recommends
-            python3 -m pip install requests --user
-      - run:
           name: Combine benchmark reports
           command: cat reports/externalTests/benchmark-*.json | scripts/externalTests/merge_benchmarks.sh > reports/externalTests/all-benchmarks.json
       - run:
