@@ -1308,14 +1308,14 @@ jobs:
         type: boolean
         default: false
     docker:
-      - image: <<parameters.image>>
-    resource_class: <<parameters.resource_class>>
+      - image: << parameters.image >>
+    resource_class: << parameters.resource_class >>
     # NOTE: Each external test runs up to 6 independent settings presets. If parallelism is higher than
     # actual preset count, some runs will exit immediately. If it's lower, some runs will get more than one preset.
     parallelism: 6
     environment:
       TERM: xterm
-      COMPILE_ONLY: <<parameters.compile_only>>
+      COMPILE_ONLY: << parameters.compile_only >>
     steps:
       - checkout
       - attach_workspace:
