@@ -1300,7 +1300,7 @@ jobs:
         default: 0
       image:
         type: string
-        default: current
+        default: cimg/node:current
       resource_class:
         type: string
         default: small
