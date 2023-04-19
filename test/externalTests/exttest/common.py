@@ -214,23 +214,19 @@ def download_project(
 def parse_solc_version(solc_version_string):
     solc_version_match = re.search(SOLC_FULL_VERSION_REGEX, solc_version_string)
     if solc_version_match:
-        solc_full_version = solc_version_match.group(1)
-    else:
-        raise RuntimeError(
-            f"Solc version could not be found in: {solc_version_string}."
-        )
-    return solc_full_version
+        return solc_version_match.group(1)
+    raise RuntimeError(
+        f"Solc version could not be found in: {solc_version_string}."
+    )
 
 
 def get_solc_short_version(solc_full_version):
     solc_short_version_match = re.search(SOLC_SHORT_VERSION_REGEX, solc_full_version)
     if solc_short_version_match:
-        solc_short_version = solc_short_version_match.group(1)
-    else:
-        raise RuntimeError(
-            f"Error extracting short version string from: {solc_full_version}."
-        )
-    return solc_short_version
+        return solc_short_version_match.group(1)
+    raise RuntimeError(
+        f"Error extracting short version string from: {solc_full_version}."
+    )
 
 
 def setup_solc(config: TestConfig, test_dir: Path) -> (str, str):

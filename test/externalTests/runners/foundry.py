@@ -57,9 +57,6 @@ class FoundryRunner(TestRunner):
         yul = ${yul}
     """
     )
-
-    foundryup_url = "https://raw.githubusercontent.com/foundry-rs/foundry/master/foundryup/foundryup"
-    foundry_repo = "https://github.com/foundry-rs/foundry.git"
     foundry_config_file = "foundry.toml"
 
     def __init__(
@@ -76,9 +73,8 @@ class FoundryRunner(TestRunner):
     def setup_environment(self, test_dir: Path):
         """Configure the project build environment"""
 
-        self.test_dir = test_dir
         print("Configuring Foundry building environment...")
-
+        self.test_dir = test_dir
         if which("forge") is None:
             raise RuntimeError("Forge not found.")
         if self.setup_fn:
@@ -116,7 +112,7 @@ class FoundryRunner(TestRunner):
             )
         )
 
-        # FIXME: Add support to solcjs. Currently only native solc is supported.
+        # TODO: Add support to solcjs. Currently only native solc is supported.
         if binary_type == "solcjs":
             raise NotImplementedError(
                 "Solcjs binaries are currently not supported with Foundry. Please use `native` binary_type."
