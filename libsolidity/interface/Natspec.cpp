@@ -78,15 +78,11 @@ Json::Value Natspec::userDocumentation(ContractDefinition const& _contractDef)
 				doc["methods"][it.second->externalSignature()]["notice"] = value;
 		}
 
-	for (auto const& event: _contractDef.definedInterfaceEvents())
+	for (auto const& event: _contractDef.interfaceEvents())
 	{
 		string value = extractDoc(event->annotation().docTags, "notice");
 		if (!value.empty())
-		{
-			Json::Value eventDoc{Json::objectValue};
-			eventDoc["notice"] = value;
-			doc["events"][event->functionType(true)->externalSignature()].append(std::move(eventDoc));
-		}
+			doc["events"][event->functionType(true)->externalSignature()]["notice"] = value;
 	}
 
 	for (auto const& error: _contractDef.interfaceErrors())
