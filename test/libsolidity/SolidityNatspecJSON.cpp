@@ -552,6 +552,56 @@ BOOST_AUTO_TEST_CASE(same_signature_event_library_contract)
 	checkNatspec(sourceCode, "C", userDoc, true);
 }
 
+BOOST_AUTO_TEST_CASE(emit_same_signature_event_different_libraries)
+{
+	char const* sourceCode = R"(
+		library L1 {
+		    /// @notice This event is defined in Library L1
+		    /// @dev This should not appear in Contract C
+		    event SameNameEvent(uint16);
+		}
+
+		library L2 {
+		    /// @notice This event is defined in Library L2
+		    /// @dev This should not appear in Contract C (?)
+		    event SameNameEvent(uint16);
+		}
+
+		contract C {
+		    function f() public {
+		        emit L1.SameNameEvent(0);
+		        emit L2.SameNameEvent(1);
+		        emit L1.SameNameEvent(2);
+		    }
+		}
+	)";
+
+	char const* devDoc = R"ABCDEF(
+	{
+		"kind": "dev",
+		"methods": {},
+		"version": 1
+	}
+	)ABCDEF";
+	checkNatspec(sourceCode, "C", devDoc, false);
+
+	char const* userDoc = R"ABCDEF(
+	{
+		"events":
+		{
+			"SameNameEvent(uint16)":
+			{
+				"notice": "This event is defined in Library L2"
+			}
+		},
+		"kind": "user",
+		"methods": {},
+		"version": 1
+	}
+	)ABCDEF";
+	checkNatspec(sourceCode, "C", userDoc, true);
+}
+
 BOOST_AUTO_TEST_CASE(event_inheritance)
 {
 	char const* sourceCode = R"(
