@@ -623,7 +623,6 @@ BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_inherited)
 		        emit D.SameNameEvent(1);
 		    }
 		}
-
 	)";
 
 	char const* devDoc = R"ABCDEF(
@@ -659,21 +658,19 @@ BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_inherited)
 	checkNatspec(sourceCode, "C", userDoc, true);
 }
 
-BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_contract)
+BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_contract_missing_natspec)
 {
 	char const* sourceCode = R"(
 		library L {
-		    /// @notice This event is defined in Library L
-			/// @dev This should not appear in Contract C devdoc
+		    /// @notice This event is defined in library L
+		    /// @dev This should not appear in contract C devdoc
 		    event SameNameEvent(uint16);
-		    /// @notice This event is defined in Library L
+		    /// @notice This event is defined in library L
 		    event LibraryEvent(uint32);
 		}
 		contract C {
-		    /// @notice This event is defined in Contract C
-			/// @dev This should appear in Contract C devdoc
 		    event SameNameEvent(uint16);
-		    /// @notice This event is defined in Contract C
+		    /// @notice This event is defined in contract C
 		    event ContractEvent(uint32);
 
 		    function f() public {
@@ -687,13 +684,6 @@ BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_contract)
 
 	char const* devDoc = R"ABCDEF(
 	{
-		"events":
-		{
-			"SameNameEvent(uint16)":
-			{
-				"details": "This should appear in Contract C devdoc"
-			}
-		},
 		"kind": "dev",
 		"methods": {},
 		"version": 1
@@ -707,15 +697,15 @@ BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_contract)
 		{
 			"ContractEvent(uint32)":
 			{
-				"notice": "This event is defined in Contract C"
+				"notice": "This event is defined in contract C"
 			},
 			"LibraryEvent(uint32)":
 			{
-				"notice": "This event is defined in Library L"
+				"notice": "This event is defined in library L"
 			},
 			"SameNameEvent(uint16)":
 			{
-				"notice": "This event is defined in Contract C"
+				"notice": "This event is defined in library L"
 			}
 		},
 		"kind": "user",
@@ -726,18 +716,16 @@ BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_contract)
 	checkNatspec(sourceCode, "C", userDoc, true);
 }
 
-BOOST_AUTO_TEST_CASE(emit_same_signature_event_different_libraries)
+BOOST_AUTO_TEST_CASE(emit_same_signature_event_different_libraries_missing_natspec)
 {
 	char const* sourceCode = R"(
 		library L1 {
-		    /// @notice This event is defined in Library L1
+		    /// @notice This event is defined in library L1
 		    /// @dev This should not appear in Contract C
 		    event SameNameEvent(uint16);
 		}
 
 		library L2 {
-		    /// @notice This event is defined in Library L2
-		    /// @dev This should not appear in Contract C (?)
 		    event SameNameEvent(uint16);
 		}
 
@@ -765,7 +753,7 @@ BOOST_AUTO_TEST_CASE(emit_same_signature_event_different_libraries)
 		{
 			"SameNameEvent(uint16)":
 			{
-				"notice": "This event is defined in Library L2"
+				"notice": "This event is defined in library L1"
 			}
 		},
 		"kind": "user",
@@ -776,18 +764,16 @@ BOOST_AUTO_TEST_CASE(emit_same_signature_event_different_libraries)
 	checkNatspec(sourceCode, "C", userDoc, true);
 }
 
-BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_inherited)
+BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_inherited_missing_natspec)
 {
 	char const* sourceCode = R"(
 		library L {
-		    /// @notice This event is defined in Library L
-		    /// @dev This should not appear in Contract C
+		    /// @notice This event is defined in library L
+		    /// @dev This should appear in contract C
 		    event SameNameEvent(uint16);
 		}
 
 		contract D {
-		    /// @notice This event is defined in contract D
-		    /// @dev This should appear in Contract C
 		    event SameNameEvent(uint16);
 		}
 
@@ -797,18 +783,10 @@ BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_inherited)
 		        emit D.SameNameEvent(1);
 		    }
 		}
-
 	)";
 
 	char const* devDoc = R"ABCDEF(
 	{
-		"events":
-		{
-			"SameNameEvent(uint16)":
-			{
-				"details": "This should appear in Contract C"
-			}
-		},
 		"kind": "dev",
 		"methods": {},
 		"version": 1
@@ -822,7 +800,7 @@ BOOST_AUTO_TEST_CASE(emit_same_signature_event_library_inherited)
 		{
 			"SameNameEvent(uint16)":
 			{
-				"notice": "This event is defined in contract D"
+				"notice": "This event is defined in library L"
 			}
 		},
 		"kind": "user",
