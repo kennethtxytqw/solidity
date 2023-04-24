@@ -485,6 +485,73 @@ BOOST_AUTO_TEST_CASE(event)
 	checkNatspec(sourceCode, "ERC20", userDoc, true);
 }
 
+BOOST_AUTO_TEST_CASE(same_signature_event_library_contract)
+{
+	char const* sourceCode = R"(
+		library L {
+		    /// @notice This event is defined in Library L
+			/// @dev This should not appear in Contract C devdoc
+		    event SameNameEvent(uint16);
+		    /// @notice This event is defined in Library L
+		    event LibraryEvent(uint32);
+		}
+		contract C {
+		    /// @notice This event is defined in Contract C
+			/// @dev This should appear in Contract C devdoc
+		    event SameNameEvent(uint16);
+		    /// @notice This event is defined in Contract C
+		    event ContractEvent(uint32);
+
+		    function f() public {
+		        emit L.SameNameEvent(0);
+		        emit SameNameEvent(1);
+		        emit L.LibraryEvent(2);
+		        emit ContractEvent(3);
+		    }
+		}
+	)";
+
+	char const* devDoc = R"ABCDEF(
+	{
+		"events":
+		{
+			"SameNameEvent(uint16)":
+			{
+				"details": "This should appear in Contract C devdoc"
+			}
+		},
+		"kind": "dev",
+		"methods": {},
+		"version": 1
+	}
+	)ABCDEF";
+	checkNatspec(sourceCode, "C", devDoc, false);
+
+	char const* userDoc = R"ABCDEF(
+	{
+		"events":
+		{
+			"ContractEvent(uint32)":
+			{
+				"notice": "This event is defined in Contract C"
+			},
+			"LibraryEvent(uint32)":
+			{
+				"notice": "This event is defined in Library L"
+			},
+			"SameNameEvent(uint16)":
+			{
+				"notice": "This event is defined in Contract C"
+			}
+		},
+		"kind": "user",
+		"methods": {},
+		"version": 1
+	}
+	)ABCDEF";
+	checkNatspec(sourceCode, "C", userDoc, true);
+}
+
 BOOST_AUTO_TEST_CASE(event_inheritance)
 {
 	char const* sourceCode = R"(
