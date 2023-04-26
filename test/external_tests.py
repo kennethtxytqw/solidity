@@ -74,10 +74,10 @@ def run_external_tests(args: dict) -> int:
     else:
         selected_tests = args["selected_tests"]
         if selected_tests:
-            diff_set = set(selected_tests) - set(all_test_scripts.keys())
-            if diff_set:
+            unrecognized_tests = set(selected_tests) - set(all_test_scripts.keys())
+            if unrecognized_tests != set():
                 raise ExternalTestNotFound(
-                    f"External test(s) not found: {', '.join(diff_set)}"
+                    f"External test(s) not found: {', '.join(unrecognized_tests)}"
                 )
             return run_test_script(
                 solc_binary_type,
