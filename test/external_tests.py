@@ -44,17 +44,14 @@ class ExternalTestNotFound(Exception):
 
 
 def external_tests_scripts() -> dict:
-    test_scripts: dict = {}
-    for f in listdir(EXTERNAL_TESTS_DIR):
-        file_path = Path(EXTERNAL_TESTS_DIR) / f
-        if file_path.is_file():
-            file_name, extension = file_path.name.split(".")
-            # TODO: Remove `file_name == "common"` when we complete the migration
-            # of the external tests to python, since there will be no more
-            # common.sh script in the externalTests folder.
-            if extension == "sh" and not file_name == "common":
-                test_scripts[file_name] = file_path
-    return test_scripts
+    # TODO: Remove `file_path.stem != "common"` when we complete the migration
+    # of the external tests to python, since there will be no more
+    # common.sh script in the externalTests folder.
+    return {
+        file_path.stem: file_path
+        for file_path in Path(EXTERNAL_TESTS_DIR).iterdir()
+        if file_path.is_file() and file_path.suffix == "sh" and file_path.stem != "common"
+    }
 
 
 def display_available_external_tests(_) -> int:
