@@ -29,6 +29,7 @@ import sys
 # pragma pylint: disable=import-error,wrong-import-position
 SCRIPTS_DIR = Path(__file__).parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS_DIR))
+
 from common.shell_command import run_cmd
 
 EXTERNAL_TESTS_DIR = Path(__file__).parent / "externalTests"
