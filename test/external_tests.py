@@ -39,9 +39,6 @@ class ExternalTestNotFound(Exception):
 
 
 def detect_external_tests() -> dict:
-    # TODO: Remove `file_path.stem != "common"` when we complete the migration
-    # of the external tests to python, since there will be no more
-    # common.sh script in the externalTests folder.
     return {
         file_path.stem: file_path
         for file_path in Path(EXTERNAL_TESTS_DIR).iterdir()
