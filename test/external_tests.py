@@ -21,7 +21,6 @@
 
 from argparse import ArgumentParser, Namespace
 import os
-from os import listdir
 from pathlib import Path
 import sys
 
@@ -35,10 +34,6 @@ from common.shell_command import run_cmd
 EXTERNAL_TESTS_DIR = Path(__file__).parent / "externalTests"
 
 
-class OptionNotFound(Exception):
-    pass
-
-
 class ExternalTestNotFound(Exception):
     pass
 
@@ -50,13 +45,13 @@ def detect_external_tests() -> dict:
     return {
         file_path.stem: file_path
         for file_path in Path(EXTERNAL_TESTS_DIR).iterdir()
-        if file_path.is_file() and file_path.suffix == "sh" and file_path.stem != "common"
+        if file_path.is_file() and file_path.suffix == ".sh" and file_path.stem != "common"
     }
 
 
 def display_available_external_tests(_) -> int:
     print("Available external tests:")
-    print(*external_tests_scripts().keys())
+    print(*detect_external_tests().keys())
     return os.EX_OK
 
 
@@ -73,7 +68,7 @@ def run_external_tests(args: dict) -> int:
     solc_binary_type = args.get("solc_binary_type")
     solc_binary_path = args.get("solc_binary_path")
 
-    all_test_scripts = external_tests_scripts()
+    all_test_scripts = detect_external_tests()
     if args.get("run_all"):
         return run_test_script(solc_binary_type, solc_binary_path, all_test_scripts)
     else:
@@ -144,19 +139,13 @@ def parse_commandline() -> Namespace:
         help="Run all available external tests.",
     )
 
-    args = parser.parse_args()
-    if not hasattr(args, "cmd"):
-        parser.print_help()
-        raise OptionNotFound
-    return args
+    return parser.parse_args()
 
 
 def main():
     try:
         args = parse_commandline()
-        return args.cmd(vars(args))
-    except OptionNotFound:
-        return os.EX_USAGE
+        args.cmd(vars(args))
     except ExternalTestNotFound as exception:
         print(f"Error: {exception}", file=sys.stderr)
         return os.EX_NOINPUT
