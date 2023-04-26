@@ -65,14 +65,14 @@ def run_test_script(solc_binary_type: str, solc_binary_path: Path, tests: dict) 
 
 
 def run_external_tests(args: dict) -> int:
-    solc_binary_type = args.get("solc_binary_type")
-    solc_binary_path = args.get("solc_binary_path")
+    solc_binary_type = args["solc_binary_type"]
+    solc_binary_path = args["solc_binary_path"]
 
     all_test_scripts = detect_external_tests()
-    if args.get("run_all"):
+    if args["run_all"]:
         return run_test_script(solc_binary_type, solc_binary_path, all_test_scripts)
     else:
-        selected_tests = args.get("selected_tests")
+        selected_tests = args["selected_tests"]
         if selected_tests:
             diff_set = set(selected_tests) - set(all_test_scripts.keys())
             if diff_set:
