@@ -33,5 +33,5 @@
 //   dup1
 //   sstore
 //     /* "":66:82   */
-//   codesize
+//   0x00
 //   jump(tag_3)
