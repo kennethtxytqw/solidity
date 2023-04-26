@@ -141,7 +141,7 @@ def parse_commandline() -> Namespace:
 def main():
     try:
         args = parse_commandline()
-        args.cmd(vars(args))
+        return args.cmd(vars(args))
     except ExternalTestNotFound as exception:
         print(f"Error: {exception}", file=sys.stderr)
         return os.EX_NOINPUT
