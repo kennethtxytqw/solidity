@@ -59,8 +59,7 @@ def run_test_scripts(solc_binary_type: str, solc_binary_path: Path, tests: dict)
     for test_name, test_script_path in tests.items():
         print(f"Running {test_name} external test...")
         ret = run_cmd(f"{test_script_path} {solc_binary_type} {solc_binary_path}")
-        if ret != os.EX_OK:
-            return ret
+        assert ret == os.EX_OK
     return os.EX_OK
 
 
