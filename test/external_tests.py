@@ -77,7 +77,7 @@ def run_external_tests(args: dict) -> int:
             diff_set = set(selected_tests) - set(all_test_scripts.keys())
             if diff_set:
                 raise ExternalTestNotFound(
-                    f"External test(s): {' '.join(diff_set)} not found"
+                    f"External test(s) not found: {', '.join(diff_set)}"
                 )
             return run_test_script(
                 solc_binary_type,
@@ -129,7 +129,7 @@ def parse_commandline() -> Namespace:
         dest="selected_tests",
         nargs="+",
         default=[],
-        help="Run one or more given external tests.",
+        help="List of one or more external tests to run (separated by sapce).",
     )
     running_mode.add_argument(
         "--run-all",
