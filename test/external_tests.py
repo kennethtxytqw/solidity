@@ -55,7 +55,7 @@ def display_available_external_tests(_) -> int:
     return os.EX_OK
 
 
-def run_test_script(solc_binary_type: str, solc_binary_path: Path, tests: dict) -> int:
+def run_test_scripts(solc_binary_type: str, solc_binary_path: Path, tests: dict) -> int:
     for test_name, test_script_path in tests.items():
         print(f"Running {test_name} external test...")
         ret = run_cmd(f"{test_script_path} {solc_binary_type} {solc_binary_path}")
@@ -70,7 +70,7 @@ def run_external_tests(args: dict) -> int:
 
     all_test_scripts = detect_external_tests()
     if args["run_all"]:
-        return run_test_script(solc_binary_type, solc_binary_path, all_test_scripts)
+        return run_test_scripts(solc_binary_type, solc_binary_path, all_test_scripts)
     else:
         selected_tests = args["selected_tests"]
         if selected_tests:
@@ -79,7 +79,7 @@ def run_external_tests(args: dict) -> int:
                 raise ExternalTestNotFound(
                     f"External test(s) not found: {', '.join(unrecognized_tests)}"
                 )
-            return run_test_script(
+            return run_test_scripts(
                 solc_binary_type,
                 solc_binary_path,
                 {k: all_test_scripts[k] for k in selected_tests},
